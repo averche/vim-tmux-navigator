@@ -21,6 +21,7 @@ if !get(g:, 'tmux_navigator_no_mappings', 0)
   noremap <silent> <c-k> :<C-U>TmuxNavigateUp<cr>
   noremap <silent> <c-l> :<C-U>TmuxNavigateRight<cr>
   noremap <silent> <c-\> :<C-U>TmuxNavigatePrevious<cr>
+  noremap <silent> <c-w> :<C-U>TmuxNavigateNext<cr>
 endif
 
 if empty($TMUX)
@@ -29,6 +30,7 @@ if empty($TMUX)
   command! TmuxNavigateUp call s:VimNavigate('k')
   command! TmuxNavigateRight call s:VimNavigate('l')
   command! TmuxNavigatePrevious call s:VimNavigate('p')
+  command! TmuxNavigateNext call s:VimNavigate('w')
   finish
 endif
 
@@ -37,6 +39,7 @@ command! TmuxNavigateDown call s:TmuxAwareNavigate('j')
 command! TmuxNavigateUp call s:TmuxAwareNavigate('k')
 command! TmuxNavigateRight call s:TmuxAwareNavigate('l')
 command! TmuxNavigatePrevious call s:TmuxAwareNavigate('p')
+command! TmuxNavigateNext call s:TmuxAwareNavigate('w')
 
 if !exists("g:tmux_navigator_save_on_switch")
   let g:tmux_navigator_save_on_switch = 0
