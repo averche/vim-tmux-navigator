@@ -127,7 +127,7 @@ function! s:TmuxAwareNavigate(direction)
   endif
 
   if s:tmux_is_last_pane
-    s:VimNavigateTop()
+    call s:VimNavigateTop()
   endif
 
   let tmux_last_pane = (a:direction == 'p' && s:tmux_is_last_pane)
