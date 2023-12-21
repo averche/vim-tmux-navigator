@@ -15,6 +15,14 @@ function! s:VimNavigate(direction)
   endtry
 endfunction
 
+function! s:VimNavigateTop()
+  try
+    execute '1wincmd w'
+  catch
+    echohl ErrorMsg | echo 'E11: Invalid in command-line window; <CR> executes, CTRL-C quits: 1wincmd w' | echohl None
+  endtry
+endfunction
+
 if !get(g:, 'tmux_navigator_no_mappings', 0)
   noremap <silent> <c-h> :<C-U>TmuxNavigateLeft<cr>
   noremap <silent> <c-j> :<C-U>TmuxNavigateDown<cr>
@@ -118,8 +126,12 @@ function! s:TmuxAwareNavigate(direction)
     endif
   endif
 
+  if s:tmux_is_last_pane
+    s:VimNavigateTop()
+  endif
+
   let tmux_last_pane = (a:direction == 'p' && s:tmux_is_last_pane)
-  if !tmux_last_pane
+  if !tmux_last_pane && !at_last_page_next_mode
     call s:VimNavigate(a:direction)
   endif
 
