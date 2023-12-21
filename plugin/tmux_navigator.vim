@@ -114,14 +114,12 @@ function! s:TmuxAwareNavigate(direction)
   let at_last_page_next_mode = (a:direction == 'w' && nr == nr_last)
   if  at_last_page_next_mode
     if s:TmuxIsSinglePane()
-      echo "is single pane"
       let at_last_page_next_mode = 0
     endif
   endif
 
   let tmux_last_pane = (a:direction == 'p' && s:tmux_is_last_pane)
-  if !tmux_last_pane && !at_last_page_next_mode
-    echo "vim navigate"
+  if !tmux_last_pane
     call s:VimNavigate(a:direction)
   endif
 
@@ -131,7 +129,6 @@ function! s:TmuxAwareNavigate(direction)
   " b) we tried switching windows in vim but it didn't have effect.
   " c) we've reached the last split in 'w' mode and tmux has other panes
   if s:ShouldForwardNavigationBackToTmux(tmux_last_pane, at_tab_page_edge, at_last_page_next_mode)
-    echo "forwarding"
     if g:tmux_navigator_save_on_switch == 1
       try
         update " save the active buffer. See :help update
