@@ -96,24 +96,34 @@ function! s:NeedsVitalityRedraw()
   return exists('g:loaded_vitality') && v:version < 704 && !has("patch481")
 endfunction
 
-function! s:ShouldForwardNavigationBackToTmux(tmux_last_pane, at_tab_page_edge)
+function! s:ShouldForwardNavigationBackToTmux(tmux_last_pane, at_tab_page_edge, at_last_page_next_mode)
   if g:tmux_navigator_disable_when_zoomed && s:TmuxVimPaneIsZoomed()
     return 0
   endif
-  return a:tmux_last_pane || a:at_tab_page_edge
+  return a:tmux_last_pane || a:at_tab_page_edge || a:at_last_page_next_mode
 endfunction
 
 function! s:TmuxAwareNavigate(direction)
   let nr = winnr()
+  let nr_last = winnr('$')
+
+  let at_last_page_next_mode = (a:direction == 'w' && nr == nr_last)
+  if  at_last_page_next_mode
+    if s:TmuxCommand("display-message -p '#{window_panes}'") == '1'
+      let at_last_page_next_mode = 0
+    endif
+  endif
+
   let tmux_last_pane = (a:direction == 'p' && s:tmux_is_last_pane)
-  if !tmux_last_pane
+  if !tmux_last_pane && !at_last_page_next_mode
     call s:VimNavigate(a:direction)
   endif
   let at_tab_page_edge = (nr == winnr())
   " Forward the switch panes command to tmux if:
   " a) we're toggling between the last tmux pane;
   " b) we tried switching windows in vim but it didn't have effect.
-  if s:ShouldForwardNavigationBackToTmux(tmux_last_pane, at_tab_page_edge)
+  " c) we've reached the last split in 'w' mode and tmux has other panes
+  if s:ShouldForwardNavigationBackToTmux(tmux_last_pane, at_tab_page_edge, at_last_page_next_mode)
     if g:tmux_navigator_save_on_switch == 1
       try
         update " save the active buffer. See :help update
