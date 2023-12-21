@@ -118,7 +118,8 @@ function! s:TmuxAwareNavigate(direction)
   if !tmux_last_pane && !at_last_page_next_mode
     call s:VimNavigate(a:direction)
   endif
-  let at_tab_page_edge = (nr == winnr())
+
+  let at_tab_page_edge = (a:direction != 'w' && nr == winnr())
   " Forward the switch panes command to tmux if:
   " a) we're toggling between the last tmux pane;
   " b) we tried switching windows in vim but it didn't have effect.
@@ -136,6 +137,9 @@ function! s:TmuxAwareNavigate(direction)
       endtry
     endif
     let args = 'select-pane -t ' . shellescape($TMUX_PANE) . ' -' . tr(a:direction, 'phjkl', 'lLDUR')
+    if a:direction == 'w'
+      let args = 'select-pane -t :.+'
+    endif
     if g:tmux_navigator_preserve_zoom == 1
       let l:args .= ' -Z'
     endif
